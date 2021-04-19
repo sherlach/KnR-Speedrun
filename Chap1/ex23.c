@@ -1,28 +1,40 @@
 #include <stdio.h>
-#include <stdbool.h>
 
 int main() {
-  bool blocked;
-  bool lined;
+  enum State { safe, waiting, lined, blocked };
+  enum State state;
   int c, p;
 
-  for (p = '\0'; (c = getchar()) != EOF; c = p) {
-    if (c == '/') {
-      if (p == '/') {
-        lined = true; 
-        p = '\0';
+  state = safe;
+
+  for (p = '\0'; (c = getchar()) != EOF; p = c) {
+    if (state == blocked) {
+      if (p == '*' && c == '/') {
+        state = safe;
         c = '\0';
       }
+    } else {
+    if (c == '/') {
+      state = waiting;
+      if (p == '/') {
+        state = lined;
+      } 
+    } else if (c == '*' && p == '/') {
+      state = blocked; 
     } else if (c == '\n') {
-      lined = false;
+      state = safe;
+    } else {
+      if (state == waiting) {
+        putchar(p);
+        state = safe;
+      }
+    }
     }
 
-
-  if (!(lined)) {
-    putchar(p);
+  if (state == safe) {
+    putchar(c);
   }
 
-  p = c;
   }
-  return 1;
+  return 0;
 }
